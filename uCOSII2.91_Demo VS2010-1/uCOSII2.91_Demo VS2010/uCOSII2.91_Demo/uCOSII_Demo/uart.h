@@ -1,0 +1,185 @@
+#ifndef _UART_H_
+#define _UART_H_
+
+/*enums*/
+typedef enum 
+{
+	UART_TOTAL_BITS_5 = 0,
+	UART_TOTAL_BITS_6,
+	UART_TOTAL_BITS_7,
+	UART_TOTAL_BITS_8,
+	UART_TOTAL_BITS_9,
+	UART_TOTAL_BITS_MAX
+}UART_TOTAL_BITS;
+
+typedef enum 
+{
+	UART_STOP_BITS_1 = 0,
+	UART_STOP_BITS_2,
+	UART_STOP_BITS_MAX
+}UART_STOP_BITS;
+
+typedef enum 
+{
+	UART_PARITY_BITS_ODD,
+	UART_PARITY_BITS_EVEN,
+	UART_PARITY_BITS_NO,    
+	UART_PARITY_BITS_MAX
+}UART_PARITY;
+
+typedef enum 
+{
+	UART_BOARD_RATE_2400 = 0,
+	UART_BOARD_RATE_4800,
+	UART_BOARD_RATE_9600,   
+	UART_BOARD_RATE_19200,  
+	UART_BOARD_RATE_38400,  
+	UART_BOARD_RATE_57600,  
+	UART_BOARD_RATE_76800,  
+	UART_BOARD_RATE_115200, 
+	UART_BOARD_RATE_230400, 
+
+	// add new enum here...
+	UART_BOARD_RATE_MAX
+}UART_BOARD_RATE;
+
+typedef enum 
+{
+	UART_INDEX_INVALID = 0,
+	UART_INDEX_1,
+	UART_INDEX_2,
+	UART_INDEX_3,
+	UART_INDEX_4,
+	UART_INDEX_5,
+	UART_INDEX_6,
+	UART_INDEX_7,
+	UART_INDEX_8,
+	UART_INDEX_9,
+	UART_INDEX_10,
+	UART_INDEX_11,
+	UART_INDEX_12,
+	UART_INDEX_13,
+	UART_INDEX_14,
+	UART_INDEX_15,
+	UART_INDEX_16,
+	UART_INDEX_17,
+	UART_INDEX_18,
+	UART_INDEX_19,
+	UART_INDEX_20,
+
+	UART_INDEX_MAX,
+}UART_INDEX;
+
+typedef enum 
+{
+	UART_HW_ENBALE_ALL, // TX and RX
+	UART_HW_ENBALE_TX,  // TX only
+	UART_HW_ENBALE_RX,  // RX only
+
+	UART_HW_ENBALE_MAX,
+}UART_HW_ENBALE;
+
+typedef enum 
+{
+	UART_RECV_ISR,
+	UART_RECV_DMA,
+	UART_RECV_POLL,
+
+	UART_RECV_MAX,
+}UART_RECV_MODE;
+
+typedef enum 
+{
+	UART_SEND_ISR,
+	UART_SEND_DMA,
+	UART_SEND_POLL,
+
+	UART_SEND_MAX,
+}UART_SEND_MODE;
+
+typedef enum 
+{
+	UART_ERR_CODE_NOERROR        = 0x0,
+	UART_ERR_CODE_RXBUF_OVERFLOW = 0x1,
+	UART_ERR_CODE_TXBUF_OVERFLOW = 0x2,    
+	UART_ERR_CODE_TIMEOUT        = 0x4,    
+	UART_ERR_CODE_PE             = 0x8,   
+	UART_ERR_CODE_NE             = 0x10,    
+	UART_ERR_CODE_FE             = 0x20,    
+	UART_ERR_CODE_ORE            = 0x40,   
+	UART_ERR_CODE_DMA            = 0x80,  
+	UART_ERR_CODE_RXDOUBLEBUF    = 0x100,
+
+	//add new error code here...
+	UART_ERR_CODE_UART_MAX       = 0xFFFF,
+}UART_ERR_CODE;
+
+typedef enum 
+{
+	UART_ERR_CODE_DMA_NOERROR       = 201,  
+	UART_ERR_CODE_DMA_TE            = 202,  
+	UART_ERR_CODE_DMA_FE            = 203, 
+	UART_ERR_CODE_DMA_DME           = 204,
+	UART_ERR_CODE_DMA_TIMEOUT       = 205,
+
+	//add new error code here...
+	UART_ERR_CODE_DMA_MAX,    
+}UART_DMA_ERR_CODE;
+
+typedef enum 
+{
+	UART_IOCTRL_CODE_RESET,
+	UART_IOCTRL_CODE_SET_CONFIG,
+	UART_IOCTRL_CODE_TX_ENABLE,
+	UART_IOCTRL_CODE_TX_DISABLE,
+	UART_IOCTRL_CODE_RX_ENABLE,
+	UART_IOCTRL_CODE_RX_DISABLE,
+	UART_IOCTRL_CODE_HARDWARE_TX_ENABLE,
+	UART_IOCTRL_CODE_HARDWARE_TX_ENABLE_READ,    
+	UART_IOCTRL_CODE_GET_ERROR,
+	UART_IOCTRL_CODE_GET_DMA_TX_ERROR,
+	UART_IOCTRL_CODE_GET_DMA_RX_ERROR,    
+	UART_IOCTRL_CODE_SET_TRANSPONDER,           // 设置转发
+	UART_IOCTRL_CODE_CANCEL_TRANSPONDER,        // 取消转发
+	UART_IOCTRL_CODE_TRANSPOND_READ,            // 转发读
+	UART_IOCTRL_CODE_TRANSPOND_WRITE,           // 转发写
+	UART_IOCTRL_CODE_SCAN_DATA,                 // 扫描数据
+
+	UART_IOCTRL_CODE_MAX
+}UART_IOCTRL_CODE;
+
+/*struct*/
+typedef struct
+{
+	unsigned short int m_SendBufferLen;
+	unsigned short int m_RecvBufferLen;    
+	unsigned short int m_RxIsrBufferLen;       
+	unsigned short int m_TxIsrBufferLen;     
+}UART_BUF_LEN;
+
+typedef struct
+{
+	UART_INDEX      mUartIndex;
+	UART_BOARD_RATE mBoardRate;
+	UART_PARITY     mBarity;
+	UART_TOTAL_BITS mDataBits;
+	UART_STOP_BITS  mStopBits;        
+	UART_RECV_MODE  mRecvMode;
+	UART_SEND_MODE  mSensMode;
+	UART_BUF_LEN    mBufLen;
+}UART_CONFIG;
+
+// 转发规则：
+// 1、支持UART1-UART8的转发处理
+// 2、相互转发的UART必须波特率等配置一致
+// 3、每一个UART同一时间只能与唯一的其他串口进行转发
+// 4、不支持UART对自己的转发，因为没有意义
+// 5、相互转发的串口都可以设置串口转发
+// 6、设置位转发模式，READ和SEND接口就不能再使用了，需要通过IOCTRL进行数据转发操作
+typedef struct 
+{
+	UART_INDEX eLeftUart;
+	UART_INDEX eRightUart;
+}UART_TRANSPONDER;
+
+#endif
